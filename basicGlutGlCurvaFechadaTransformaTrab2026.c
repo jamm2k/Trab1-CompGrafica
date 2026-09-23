@@ -354,7 +354,7 @@ void processMenuEvents(int option)
 
 	switch (option) 
 	{
-		case 1: Poligono(nPtsCtrole, ptsContrle, 0.0, 1.0, 0.0); break;
+		case 1: Poligono(nPtsCtrole, ptsContrle, 0.0, 1.0, 0.0, jaCurva); break;
 		case 2: init();
 		break;
 	}
@@ -364,7 +364,7 @@ void processMenuEvents(int option)
 
 void createGLUTMenus() 
 {
-	int menu, submenu1, submenu2;
+	int submenu1, submenu2;
 
 	submenu1 = glutCreateMenu(processMenuCurvas);
 	glutAddMenuEntry("Hermite", HERMITE);
@@ -379,7 +379,7 @@ void createGLUTMenus()
 	glutAddMenuEntry("Cisalha", CISALHA);
 	glutAddMenuEntry("Manipular Pto", 0);
 
-	menu = glutCreateMenu(processMenuEvents);
+	glutCreateMenu(processMenuEvents);
 	glutAddMenuEntry("Poligono de Control",1);
 	glutAddSubMenu("Tipo de Curva",submenu1);
 	glutAddSubMenu("Transformacao",submenu2);
