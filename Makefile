@@ -1,11 +1,11 @@
 # Compilador e flags
-CC = gcc
-CFLAGS = -Wall
-LIBS = -lglut -lGLU -lGL -lm
+CC = C:\msys64\ucrt64\bin\gcc.exe
+CFLAGS = -Wall -I"C:\msys64\ucrt64\include"
+LIBS = -L"C:\msys64\ucrt64\lib" -lfreeglut -lglu32 -lopengl32 -lm
 
 # Arquivos
 SRC = basicGlutGlCurvaFechadaTransformaTrab2026.c
-TARGET = programa
+TARGET = programa.exe
 
 all: $(TARGET)
 
@@ -13,9 +13,9 @@ $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LIBS)
 
 run: $(TARGET)
-	./$(TARGET)
+	.\$(TARGET)
 
 clean:
-	rm -f $(TARGET)
+	del /f /q $(TARGET)
 
 .PHONY: all run clean
