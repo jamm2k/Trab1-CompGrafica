@@ -42,6 +42,8 @@ int jaCurva = 0;
 int ptoSelect = -1;
 int tipoCurva = 0;
 int tipoTransforma = 0;
+int lastX = 0; //*rastrear o delta do mov. do mouse
+int lastY = 0;
 
 // matriz de trabalho
 float M[4][4] = {{0.0, 0.0, 0.0, 0.0},
@@ -385,43 +387,78 @@ void createGLUTMenus()
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 } 
 
-void motion(int x, int y)
-{
-	x = x - windW; y = windH - y;
-	if(jaCurva)
-		if(!tipoTransforma)
-		{
-			ptsContrle[ptoSelect].v[0] = (float)x;
-			ptsContrle[ptoSelect].v[1] = (float)y;
-		}
-		else
-		{
-			printf(" transformando, ");
-			switch (tipoTransforma) 
-			{
-				case TRANSLACAO:  printf(" Translacao, ");
-					//rocTranslacao();
-					break;
+void motion(int x, int y) {
+  x = x - windW;
+  y = windH - y;
+  if (jaCurva) {
+    if (!tipoTransforma) {
+      if (ptoSelect >= 0 && ptoSelect < nPtsCtrole) {
+        ptsContrle[ptoSelect].v[0] = (float)x;
+        ptsContrle[ptoSelect].v[1] = (float)y;
+      }
+    } else {
+      float dx = (float)(x - lastX);
+      float dy = (float)(y - lastY);
+      float cx = 0, cy = 0;
+      int i;
 
-				case ROTACAO:   printf(" Rotacao, ");
-					//procRotacao();
-					break;
+      for (i = 0; i < nPtsCtrole; i++) {
+        cx += ptsContrle[i].v[0];
+        cy += ptsContrle[i].v[1];
+      }
+      if (nPtsCtrole > 0) {
+        cx /= nPtsCtrole;
+        cy /= nPtsCtrole;
+      }
 
-				case SCALA:    printf(" Scala, ");
-				//	procScala();
-					break;
+      switch (tipoTransforma) {
+      case TRANSLACAO:
+        for (i = 0; i < nPtsCtrole; i++) {
+          ptsContrle[i].v[0] += dx;
+          ptsContrle[i].v[1] += dy;
+        }
+        break;
 
-				case CISALHA:   printf(" Cisalha, ");
-				//	procCisalha();
-					break;
+      case ROTACAO: {
+        float angle = dx * 0.01f;
+        float cosA = cos(angle);
+        float sinA = sin(angle);
+        for (i = 0; i < nPtsCtrole; i++) {
+          float px = ptsContrle[i].v[0] - cx;
+          float py = ptsContrle[i].v[1] - cy;
+          ptsContrle[i].v[0] = px * cosA - py * sinA + cx;
+          ptsContrle[i].v[1] = px * sinA + py * cosA + cy;
+        }
+        break;
+      }
 
-				break;
-			}
-		}
+      case SCALA: {
+        float scale = 1.0f + (dy * 0.01f);
+        if (scale < 0.1f)
+          scale = 0.1f;
+        for (i = 0; i < nPtsCtrole; i++) {
+          float px = ptsContrle[i].v[0] - cx;
+          float py = ptsContrle[i].v[1] - cy;
+          ptsContrle[i].v[0] = px * scale + cx;
+          ptsContrle[i].v[1] = py * scale + cy;
+        }
+        break;
+      }
 
-//	CurveDraw();
-
-	glutPostRedisplay();
+      case CISALHA: {
+        float shx = dx * 0.01f;
+        for (i = 0; i < nPtsCtrole; i++) {
+          float py = ptsContrle[i].v[1] - cy;
+          ptsContrle[i].v[0] += py * shx;
+        }
+        break;
+      }
+      }
+    }
+  }
+  lastX = x;
+  lastY = y;
+  glutPostRedisplay();
 }
 
 int buscaPuntoClick(int x, int y)
@@ -453,6 +490,8 @@ void mouse(int button, int state, int x, int y)
 		{
 			x = x - windW; 
 			y = windH - y;
+			lastX = x;
+			lastY = y;
 			if(!jaCurva)        // ainda esta na geracao dos pontos de controle
 			{
 				// gera UM ponto de controle por cada CLICK
