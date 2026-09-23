@@ -187,17 +187,22 @@ void verticesDraw(int n, tipoPto vertices[MAXVERTEXS], float cr, float cg, float
 	glEnd();
 }
 
-void Poligono(int n, tipoPto vertices[MAXVERTEXS], float cb, float cg, float cr )
-{
-	int i;
+void Poligono(int n, tipoPto vertices[MAXVERTEXS], float cb, float cg, float cr,
+              int fechado) {
+  int i;
 
-	glColor3f(cb, cg, cr); 
+  glColor3f(cb, cg, cr);
 
-	glBegin(GL_LINE_STRIP);
-	for(i=0; i<n; i++) {
-		glVertex2fv(vertices[i].v);
-	}
-	glEnd();
+  if (fechado)
+    glBegin(GL_LINE_LOOP); // conecta ultimo ponto ao primeiro com uma linha
+                           // reta (fechar a curva)
+  else
+    glBegin(GL_LINE_STRIP);
+
+  for (i = 0; i < n; i++) {
+    glVertex2fv(vertices[i].v);
+  }
+  glEnd();
 }
 
 void geraCurva(int j)
@@ -226,23 +231,27 @@ static void Draw(void)
 	coord_line();	                                       // define eixos do sistema cartesiano (SRU)
 	
 	verticesDraw(nPtsCtrole, ptsContrle, 0.0, 1.0, 0.0);   // Mostra os pontos de controle cor(0., 1.0, 0.0)
-	Poligono(nPtsCtrole, ptsContrle, 0.0, 0.0, 0.0);	   // mostra o pol�gono de controle cor (0.0, 0.0, 0.0)
+	Poligono(nPtsCtrole, ptsContrle, 0.0, 0.0, 0.0, jaCurva);	   // mostra o pol�gono de controle cor (0.0, 0.0, 0.0)
 
-	if(jaCurva)		                                       // opcao ativa para as curvas
-		while(j<nPtsCtrole){
-			geraCurva(j);                                  // gera o peda�o da curva j
-			c = j%(nCors-3);		                       // define indico da cor do peda�o j
-				// mostra o peda�o da curva
-			Poligono(nPtsCurva, ptsCurva, MCor[c][0], MCor[c][1], MCor[c][2]);	 
-			j++;
-		}
-
-    if (doubleBuffer) 
-	{
-	   glutSwapBuffers(); 
-    } else {
-	   glFlush();     
+  if (jaCurva) { // opcao ativa para as curvas
+    int step = 1;
+    if (tipoCurva == BEZIER || tipoCurva == HERMITE)
+      step = 3; //**para avaliar blocos independentes de pontos para formar cada
+                // segmento**//
+    while (j < nPtsCtrole) {
+      geraCurva(j);                 // gera o pedaço da curva j
+      c = (j / step) % (nCors - 3); // **define indico da cor do pedaço j
+                                    // mostra o pedaço da curva
+      Poligono(nPtsCurva, ptsCurva, MCor[c][0], MCor[c][1], MCor[c][2], 0);
+      j += step;
     }
+  }
+
+  if (doubleBuffer) {
+    glutSwapBuffers();
+  } else {
+    glFlush();
+  }
 }
 
 static void Args(int argc, char **argv)
