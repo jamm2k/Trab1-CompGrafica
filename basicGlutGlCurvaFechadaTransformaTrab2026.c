@@ -1,8 +1,13 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include "GL/glut.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAXVERTEXS 30 
 #define NPOLYGON 6 
@@ -14,7 +19,7 @@
 #define BSPLINE 3
 #define CATMULLR 4
 
-//  tipo de transformação ------
+//  tipo de transformaï¿½ï¿½o ------
 #define TRANSLACAO 1
 #define ROTACAO 2
 #define SCALA 3
@@ -231,13 +236,13 @@ static void Draw(void)
 	coord_line();	                                       // define eixos do sistema cartesiano (SRU)
 	
 	verticesDraw(nPtsCtrole, ptsContrle, 0.0, 1.0, 0.0);   // Mostra os pontos de controle cor(0., 1.0, 0.0)
-	Poligono(nPtsCtrole, ptsContrle, 0.0, 0.0, 0.0);	   // mostra o polígono de controle cor (0.0, 0.0, 0.0)
+	Poligono(nPtsCtrole, ptsContrle, 0.0, 0.0, 0.0);	   // mostra o polï¿½gono de controle cor (0.0, 0.0, 0.0)
 
 	if(jaCurva)		                                       // opcao ativa para as curvas
 		while(j<nPtsCtrole){
-			geraCurva(j);                                  // gera o pedaço da curva j
-			c = j%(nCors-3);		                       // define indico da cor do pedaço j
-				// mostra o pedaço da curva
+			geraCurva(j);                                  // gera o pedaï¿½o da curva j
+			c = j%(nCors-3);		                       // define indico da cor do pedaï¿½o j
+				// mostra o pedaï¿½o da curva
 			Poligono(nPtsCurva, ptsCurva, MCor[c][0], MCor[c][1], MCor[c][2]);	 
 			j++;
 		}
@@ -443,7 +448,7 @@ int buscaPuntoClick(int x, int y)
 void mouse(int button, int state, int x, int y)
 { 
 	   // esta aqui porque ocorreu um evento: Buttom de mause foi presionado ou solto 
-	   // estando o cursor na posição (x, y) de canvas
+	   // estando o cursor na posiï¿½ï¿½o (x, y) de canvas
 	if(button == GLUT_LEFT)
 		if(state == GLUT_DOWN)
 		{
