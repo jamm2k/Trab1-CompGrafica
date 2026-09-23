@@ -79,45 +79,49 @@ float MCor[9][3] = {{1.0, 0.5, 0.0}, {0.8, 0.7, 0.5}, {0.5, 0.5, 0.5},
 int nCors = 9;
 
 
-void ptoCurva(float t, int j, float pp[3])
-{
-    int i, ji;
-	float cc;
-    tipoPto ptsCont[MAXVERTEXS];
+void ptoCurva(float t, int j, float pp[3]) {
+  int i, ji;
+  float cc;
+  tipoPto ptsCont[MAXVERTEXS];
 
-	pp[0]=pp[1]=pp[2]=0.0;
+  pp[0] = pp[1] = pp[2] = 0.0;
 
-	// BEGIN preparando os pontos de controle por causa de hermite
-	for(i=0; i<4; i++)
-	{
-		ji = (j+i)%nPtsCtrole;
-		ptsCont[i].v[0] = ptsContrle[ji].v[0];
-		ptsCont[i].v[1] = ptsContrle[ji].v[1];
-		ptsCont[i].v[2] = ptsContrle[ji].v[2];
-	}
-	
-	if(tipoCurva == HERMITE) {
-		ptsCont[j+1].v[0] = ptsContrle[j+3].v[0];
-		ptsCont[j+1].v[1] = ptsContrle[j+3].v[1];
-		ptsCont[j+1].v[2] = ptsContrle[j+3].v[2];
-		
-		ptsCont[j+2].v[0] = ptsContrle[j+0].v[0] - ptsContrle[j+1].v[0];
-		ptsCont[j+2].v[1] = ptsContrle[j+0].v[1] - ptsContrle[j+1].v[1];
-		ptsCont[j+2].v[2] = ptsContrle[j+0].v[2] - ptsContrle[j+1].v[2];
+  // BEGIN preparando os pontos de controle por causa de hermite
+  for (i = 0; i < 4; i++) {
+    ji = (j + i) % nPtsCtrole;
+    ptsCont[i].v[0] = ptsContrle[ji].v[0];
+    ptsCont[i].v[1] = ptsContrle[ji].v[1];
+    ptsCont[i].v[2] = ptsContrle[ji].v[2];
+  }
 
-		ptsCont[j+3].v[0] = ptsContrle[j+3].v[0] - ptsContrle[j+2].v[0];
-		ptsCont[j+3].v[1] = ptsContrle[j+3].v[1] - ptsContrle[j+2].v[1];
-		ptsCont[j+3].v[2] = ptsContrle[j+3].v[2] - ptsContrle[j+2].v[2];
-	}
-    // END preparacao de ptos de controle para HERMITE
-    
-	for(i=0; i<4; i++)
-	{
-		cc = t*t*t*M[0][i] + t*t*M[1][i] + t*M[2][i] + M[3][i];
-		pp[0] += cc * ptsCont[i].v[0];
-		pp[1] += cc * ptsCont[i].v[1];
-		pp[2] += cc * ptsCont[i].v[2];
-	}
+  if (tipoCurva == HERMITE) {
+    ptsCont[1].v[0] = ptsContrle[(j + 3) % nPtsCtrole].v[0];
+    ptsCont[1].v[1] = ptsContrle[(j + 3) % nPtsCtrole].v[1];
+    ptsCont[1].v[2] = ptsContrle[(j + 3) % nPtsCtrole].v[2];
+
+    ptsCont[2].v[0] =
+        ptsContrle[(j + 1) % nPtsCtrole].v[0] -
+        ptsContrle[j % nPtsCtrole].v[0]; // estava somando de forma estática
+    ptsCont[2].v[1] =                    // não fecharia a curva
+        ptsContrle[(j + 1) % nPtsCtrole].v[1] - ptsContrle[j % nPtsCtrole].v[1];
+    ptsCont[2].v[2] =
+        ptsContrle[(j + 1) % nPtsCtrole].v[2] - ptsContrle[j % nPtsCtrole].v[2];
+
+    ptsCont[3].v[0] = ptsContrle[(j + 3) % nPtsCtrole].v[0] -
+                      ptsContrle[(j + 2) % nPtsCtrole].v[0];
+    ptsCont[3].v[1] = ptsContrle[(j + 3) % nPtsCtrole].v[1] -
+                      ptsContrle[(j + 2) % nPtsCtrole].v[1];
+    ptsCont[3].v[2] = ptsContrle[(j + 3) % nPtsCtrole].v[2] -
+                      ptsContrle[(j + 2) % nPtsCtrole].v[2];
+  }
+  // END preparacao de ptos de controle para HERMITE
+
+  for (i = 0; i < 4; i++) {
+    cc = t * t * t * M[0][i] + t * t * M[1][i] + t * M[2][i] + M[3][i];
+    pp[0] += cc * ptsCont[i].v[0];
+    pp[1] += cc * ptsCont[i].v[1];
+    pp[2] += cc * ptsCont[i].v[2];
+  }
 }
 
 void init(void)
