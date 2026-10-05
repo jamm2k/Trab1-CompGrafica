@@ -24,6 +24,7 @@
 #define ROTACAO 2
 #define SCALA 3
 #define CISALHA 4
+#define ESPELHAMENTO 5
 
 GLenum doubleBuffer;    
 
@@ -342,6 +343,10 @@ void processMenuTransforma(int option)
 			printf("\n Cisalha....\n");
 			break;
 
+		case ESPELHAMENTO:
+			printf("\n Espelhamento....\n");
+			break;
+
 		break;
 	}
 
@@ -377,6 +382,7 @@ void createGLUTMenus()
 	glutAddMenuEntry("Rotacao", ROTACAO);
 	glutAddMenuEntry("Scala", SCALA);
 	glutAddMenuEntry("Cisalha", CISALHA);
+	glutAddMenuEntry("Espelhamento", ESPELHAMENTO);
 	glutAddMenuEntry("Manipular Pto", 0);
 
 	glutCreateMenu(processMenuEvents);
@@ -450,6 +456,20 @@ void motion(int x, int y) {
         for (i = 0; i < nPtsCtrole; i++) {
           float py = ptsContrle[i].v[1] - cy;
           ptsContrle[i].v[0] += py * shx;
+        }
+        break;
+      }
+
+      case ESPELHAMENTO: {
+        if ((lastX <= cx && x > cx) || (lastX >= cx && x < cx)) {
+          for (i = 0; i < nPtsCtrole; i++) {
+            ptsContrle[i].v[0] = cx - (ptsContrle[i].v[0] - cx);
+          }
+        }
+        if ((lastY <= cy && y > cy) || (lastY >= cy && y < cy)) {
+          for (i = 0; i < nPtsCtrole; i++) {
+            ptsContrle[i].v[1] = cy - (ptsContrle[i].v[1] - cy);
+          }
         }
         break;
       }
